@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<title>Salman Bhai — Stress Relief</title>
+<style>
+  :root {
+    --bg-1: #0a0a0f;
+    --red: #e63946;
+    --red-soft: rgba(230, 57, 70, 0.15);
+    --gold: #f4a261;
+    --text: #f1faee;
+    --text-dim: rgba(241, 250, 238, 0.55);
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --radius: 20px;
+    --radius-sm: 14px;
+    --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    background: var(--bg-1);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  .glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-1 {
+    width: 300px; height: 300px;
+    background: var(--red);
+    top: -100px; right: -80px;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .glow-2 {
+    width: 250px; height: 250px;
+    background: var(--gold);
+    bottom: -80px; left: -60px;
+    opacity: 0.25;
+    animation: drift 15s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 20px) scale(1.15); }
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  /* ═══ LANDING ═══ */
+  .landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    padding: 20px;
+    max-width: 420px;
+  }
+  .landing .emoji-big {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+  .landing h1 {
+    font-size: clamp(26px, 7vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .landing p {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 28px;
+    max-width: 300px;
+  }
+  .landing .credit {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 20px;
+    opacity: 0.6;
+  }
+
+  .enter-btn {
+    position: relative;
+    background: linear-gradient(135deg, var(--red), #b8222f);
+    color: #fff;
+    border: none;
+    padding: 16px 44px;
+    border-radius: 50px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 32px rgba(230, 57, 70, 0.35), 0 0 0 1px rgba(255,255,255,0.06) inset;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .enter-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  .enter-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 16px rgba(230, 57, 70, 0.3);
+  }
+  .enter-btn:active::after { transform: translateX(100%); }
+
+  /* ═══ GAME ═══ */
+  .game {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 460px;
+    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    padding-bottom: 24px;
+  }
+  .game.active { display: flex; }
+
+  .mood-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .mood-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    width: 100%;
+    padding: 4px 4px 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+  }
+  .mood-bar::-webkit-scrollbar { display: none; }
+
+  .mood-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 50px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    scroll-snap-align: start;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .mood-chip .chip-emoji { font-size: 16px; }
+  .mood-chip.active {
+    background: var(--red-soft);
+    border-color: rgba(230, 57, 70, 0.4);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(230, 57, 70, 0.15);
+  }
+  .mood-chip:active { transform: scale(0.94); }
+
+  .bhai-card {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 20px;
+    border-radius: var(--radius);
+    background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .bhai-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(244,162,97,0.4), transparent);
+  }
+
+  .bhai-btn {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+    height: 320px;
+    border-radius: 28px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+    background: #1a0e0e;
+    box-shadow:
+      0 0 0 2px rgba(244, 162, 97, 0.25),
+      0 12px 40px rgba(0,0,0,0.6),
+      0 0 60px rgba(230, 57, 70, 0.15);
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    margin-bottom: 14px;
+  }
+  .bhai-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 15%;
+    transition: transform 0.3s;
+    display: block;
+  }
+  .bhai-btn:active { transform: scale(0.96); }
+  .bhai-btn:active .bhai-photo { transform: scale(1.05); }
+  .bhai-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 50px 16px 20px;
+    background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.6) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+  }
+  .bhai-overlay .name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(244, 162, 97, 0.5);
+  }
+  .bhai-overlay .sub {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .bhai-btn.shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    15% { transform: rotate(-3deg) scale(1.02); }
+    30% { transform: rotate(2deg) scale(1.01); }
+    45% { transform: rotate(-2deg) scale(1.02); }
+    60% { transform: rotate(1deg) scale(1); }
+    75% { transform: rotate(-1deg) scale(1.01); }
+  }
+
+  .bhai-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+    animation: pulseHint 2.5s ease-in-out infinite;
+    text-align: center;
+  }
+  @keyframes pulseHint {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ── Photo picker button ── */
+  .photo-pick-btn {
+    margin-top: 10px;
+    padding: 8px 18px;
+    border-radius: 50px;
+    background: rgba(244, 162, 97, 0.08);
+    border: 1px solid rgba(244, 162, 97, 0.25);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.3px;
+  }
+  .photo-pick-btn:active {
+    transform: scale(0.95);
+    background: rgba(244, 162, 97, 0.16);
+  }
+  .photo-pick-btn.hidden { display: none; }
+
+  /* ── Quote Area ── */
+  .quote-area {
+    width: 100%;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 18px;
+    border-radius: var(--radius-sm);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 12px;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .quote-area.animating {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  .quote-text {
+    font-size: 16px;
+    line-height: 1.55;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 14px;
+    border-left: 2px solid var(--red);
+  }
+  .quote-text::before {
+    content: '"';
+    position: absolute;
+    left: -2px;
+    top: -8px;
+    font-size: 36px;
+    color: var(--red);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .quote-source {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+  .quote-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .humor-line {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(244, 162, 97, 0.06);
+    border: 1px solid rgba(244, 162, 97, 0.1);
+    font-size: 13px;
+    color: var(--gold);
+    line-height: 1.45;
+    margin-bottom: 14px;
+    text-align: center;
+    font-weight: 500;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .humor-line.animating {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .progress-track {
+    width: 80px;
+    height: 3px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    width: 0%;
+  }
+
+  .again-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 50px;
+    border: 1px solid rgba(230, 57, 70, 0.3);
+    background: rgba(230, 57, 70, 0.08);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    letter-spacing: 0.2px;
+  }
+  .again-btn:active {
+    transform: scale(0.96);
+    background: rgba(230, 57, 70, 0.18);
+    box-shadow: 0 0 30px rgba(230, 57, 70, 0.15);
+  }
+
+  .personal-note {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    opacity: 0.7;
+  }
+  .personal-note .heart {
+    display: inline-block;
+    animation: heartBeat 1.5s ease-in-out infinite;
+  }
+  @keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.2); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: rgba(20, 10, 10, 0.9);
+    border: 1px solid rgba(244, 162, 97, 0.2);
+    color: var(--gold);
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @media (min-width: 480px) {
+    .bhai-btn { max-width: 260px; height: 340px; }
+    .quote-text { font-size: 17px; }
+    .mood-chip { font-size: 14px; padding: 10px 18px; }
+  }
+
+  @media (max-height: 700px) {
+    .bhai-btn { max-width: 200px; height: 260px; }
+    .bhai-card { padding: 16px 12px 14px; }
+    .quote-area { min-height: 110px; padding: 14px; }
+    .landing .emoji-big { font-size: 48px; }
+  }
+
+  .app::-webkit-scrollbar { display: none; }
+  .app { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="app" id="app">
+
+  <!-- ═══ LANDING ═══ -->
+  <div class="landing" id="landing">
+    <div class="emoji-big">😭</div>
+    <h1>Feeling Tensed?</h1>
+    <p>Don't worry…<br><strong style="color: var(--gold);">Salman Bhai has entered the chat.</strong></p>
+    <button class="enter-btn" id="enterBtn">Let Bhai In 🚪</button>
+    <div class="credit">A tiny stress-relief machine</div>
+  </div>
+
+  <!-- ═══ GAME ═══ -->
+  <div class="game" id="game">
+
+    <div class="mood-label">How are you feeling?</div>
+    <div class="mood-bar" id="moodBar"></div>
+
+    <div class="bhai-card">
+      <button class="bhai-btn" id="bhaiBtn" aria-label="Press Salman Bhai for motivation">
+        <img class="bhai-photo" id="bhaiPhoto" alt="Salman Khan" />
+        <div class="bhai-overlay">
+          <span class="name">Salman Bhai</span>
+          <span class="sub">tap for wisdom</span>
+        </div>
+      </button>
+
+      <!-- Photo picker (shows automatically if photo not found) -->
+      <button class="photo-pick-btn hidden" id="photoPickBtn">📷 Set Bhai's photo</button>
+
+      <div class="bhai-hint" id="bhaiHint">Press Bhai when you're ready</div>
+    </div>
+
+    <div class="quote-area" id="quoteArea">
+      <div class="quote-text" id="quoteText">Bhai is waiting to drop some wisdom…</div>
+      <div class="quote-source" id="quoteSource"></div>
+      <div class="quote-meta" id="quoteMeta"></div>
+    </div>
+
+    <div class="humor-line" id="humorLine" style="display:none;"></div>
+
+    <div class="progress-row" id="progressRow" style="display:none;">
+      <span>Wisdom received</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="progressCount">0/0</span>
+    </div>
+
+    <button class="again-btn" id="againBtn">Bhai, I need motivation again 💪</button>
+
+    <div class="personal-note">
+      Made specially for you <span class="heart">❤️</span><br>
+      Whenever life gets too much, press Bhai.
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- Hidden file input for photo picker -->
+<input type="file" id="photoInput" accept="image/*" style="display:none;">
+
+<script>
+(function(){
+  'use strict';
+
+  /* ═══════════════════════════════════════════
+     VERIFIED SALMAN KHAN QUOTE DATABASE
+     ═══════════════════════════════════════════ */
+  const QUOTES = [
+    { id:'q1', text:"No matter how down you are, how messed up you are, that shot has to be done right.", source:"Salman Khan — Filmfare exclusive interview", meta:"2025", moods:['stressed','noenergy'] },
+    { id:'q2', text:"Present becomes yr past, past catches up 2 your future, present Is a gift, do right with it, mistakes repeated becomes a habit n then your character, dont blame any 1 , no 1 can make u do anything that u don't want to.", source:"Salman Khan — post on X (@BeingSalmanKhan)", meta:"July 26, 2025", moods:['stressed','motivation'] },
+    { id:'q3', text:"Thinking yeh hai kisi bhi field mai. Soch lo samaj lo clear ho jao decision lo aur sab bhool ke aage badho and topi se yaad aaya topi khud pehno kisi ko pehnao nahi na kisi ko pehnane do.", source:"Salman Khan — post on X (@BeingSalmanKhan)", meta:"May 3, 2026", moods:['brain','motivation','annoyed'] },
+    { id:'q4', text:"Take care and protect the man in the mirror… wohi kaam aayega.", source:"Salman Khan — post on X (@BeingSalmanKhan)", meta:"July 2, 2025", moods:['emotional','noenergy'] },
+    { id:'q5', text:"Agar dikhana hai, beat Karna hai, maarna hai, toh mehnat kar ke apna level badha ke kaam se maaro… nothing better than working hard…", source:"Salman Khan — post on X (@BeingSalmanKhan)", meta:"July 1, 2019", moods:['annoyed','motivation','noenergy'] },
+    { id:'q6', text:"Go inside a room, have a good cry and finish the subject. Come out and just say, 'What's up? How's it going?'", source:"Salman Khan — Dumb Biryani podcast with Arhaan Khan", meta:"February 2025", moods:['emotional','stressed'] },
+    { id:'q7', text:"I wake up in the morning, have my coffee and thank God for giving me another day to get through. I am really blessed.", source:"Salman Khan — India Today exclusive interview", meta:"November 24, 2023", moods:['emotional','motivation'] },
+    { id:'q8', text:"I've learnt that you can't take anything for granted. To stay at the top, you need to fight.", source:"Salman Khan — Filmfare exclusive interview", meta:"2025", moods:['noenergy','motivation'] },
+    { id:'q9', text:"When I started working, the lows that you are talking about, it was not my highs at the best. I struggled and if I didn't make it, I would be happy with that.", source:"Salman Khan — India Today exclusive interview", meta:"November 24, 2023", moods:['stressed','noenergy'] },
+    { id:'q10', text:"Call me arrogant or whatever you like. I am like this.", source:"Salman Khan — interview (via The Express Tribune)", meta:"circa 1998", moods:['annoyed'] }
+  ];
+
+  const MOODS = [
+    { id:'stressed',  emoji:'😭', label:"I'm stressed" },
+    { id:'brain',     emoji:'😵', label:"Brain stopped" },
+    { id:'annoyed',   emoji:'😤', label:"I'm annoyed" },
+    { id:'emotional', emoji:'🥲', label:"Need support" },
+    { id:'noenergy',  emoji:'😴', label:"No energy" },
+    { id:'motivation',emoji:'❤️', label:"Motivate me" }
+  ];
+
+  const HUMOUR = [
+    "Bhai has spoken. Stress has been temporarily suspended. 🫡",
+    "Your tension just got evicted. Bhai is the landlord. 🏠",
+    "Bhai's words: downloaded. Now go conquer. 💪",
+    "Stress called. Bhai picked up. You're safe. 📞",
+    "Bhai ne bola, toh baat khatam. Move on. 🚀",
+    "That frown? Bhai just cancelled it. ❌",
+    "Bhai wisdom received. Brain reboot in progress… 🔄",
+    "Consider your worries officially benched. 🪑",
+    "Bhai said it. So it's basically a law now. 📜",
+    "Anxiety has left the chat. Bhai is moderating. 🛡️",
+    "You + Bhai's words = unstoppable combo. ⚡",
+    "Bhai dropped truth. Stress dropped dead. 💥"
+  ];
+
+  /* ═══════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════ */
+  let currentMood = 'stressed';
+  let seenIds = new Set();
+  let isAnimating = false;
+
+  const $ = (s) => document.querySelector(s);
+  const landing = $('#landing');
+  const game = $('#game');
+  const moodBar = $('#moodBar');
+  const bhaiBtn = $('#bhaiBtn');
+  const bhaiPhoto = $('#bhaiPhoto');
+  const bhaiHint = $('#bhaiHint');
+  const photoPickBtn = $('#photoPickBtn');
+  const photoInput = $('#photoInput');
+  const quoteArea = $('#quoteArea');
+  const quoteText = $('#quoteText');
+  const quoteSource = $('#quoteSource');
+  const quoteMeta = $('#quoteMeta');
+  const humorLine = $('#humorLine');
+  const progressRow = $('#progressRow');
+  const progressFill = $('#progressFill');
+  const progressCount = $('#progressCount');
+  const againBtn = $('#againBtn');
+  const toast = $('#toast');
+
+  /* ═══════════════════════════════════════════
+     PHOTO LOADING — try multiple sources
+     ═══════════════════════════════════════════ */
+  const FALLBACK_URL = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Salman_Khan_meets_PM_Modi.jpg/960px-Salman_Khan_meets_PM_Modi.jpg';
+
+  // Possible local filenames to try (case variations)
+  const LOCAL_CANDIDATES = ['salman.jpg', 'salman.jpeg', 'Salman.jpg', 'Salman.JPG', 'salman.png', 'Salman.png'];
+
+  function initPhoto() {
+    // 1. Check localStorage (user-picked photo)
+    const saved = localStorage.getItem('bhaiPhoto');
+    if (saved) {
+      bhaiPhoto.src = saved;
+      photoPickBtn.classList.remove('hidden');
+      photoPickBtn.textContent = '📷 Change Bhai\'s photo';
+      return;
+    }
+
+    // 2. Try local files one by one
+    let idx = 0;
+    function tryNext() {
+      if (idx >= LOCAL_CANDIDATES.length) {
+        // All local attempts failed — use fallback and show picker
+        bhaiPhoto.src = FALLBACK_URL;
+        photoPickBtn.classList.remove('hidden');
+        photoPickBtn.textContent = '📷 Use your own photo of Bhai';
+        return;
+      }
+      const testSrc = LOCAL_CANDIDATES[idx++];
+      const test = new Image();
+      test.onload = () => { bhaiPhoto.src = testSrc; };
+      test.onerror = tryNext;
+      test.src = testSrc;
+    }
+    tryNext();
+  }
+
+  // Handle photo picker
+  photoPickBtn.addEventListener('click', () => photoInput.click());
+
+  photoInput.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        // Compress to max 800px and quality 0.82 to fit in localStorage
+        const MAX = 800;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const scale = MAX / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+        try {
+          localStorage.setItem('bhaiPhoto', dataUrl);
+        } catch (err) {
+          console.warn('Could not save photo — too large or storage disabled.', err);
+        }
+
+        bhaiPhoto.src = dataUrl;
+        photoPickBtn.textContent = '📷 Change Bhai\'s photo';
+        showToast('Bhai is looking sharp! 📸');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ═══════════════════════════════════════════
+     MOOD BAR
+     ═══════════════════════════════════════════ */
+  function buildMoods() {
+    moodBar.innerHTML = '';
+    MOODS.forEach(m => {
+      const chip = document.createElement('button');
+      chip.className = 'mood-chip' + (m.id === currentMood ? ' active' : '');
+      chip.dataset.mood = m.id;
+      chip.innerHTML = `<span class="chip-emoji">${m.emoji}</span>${m.label}`;
+      chip.addEventListener('click', () => selectMood(m.id));
+      moodBar.appendChild(chip);
+    });
+  }
+
+  function selectMood(id) {
+    currentMood = id;
+    document.querySelectorAll('.mood-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.mood === id);
+    });
+    seenIds.clear();
+    updateProgress();
+    showToast('Mood set. Press Bhai.');
+  }
+
+  /* ═══════════════════════════════════════════
+     QUOTE PICKING
+     ═══════════════════════════════════════════ */
+  function pickQuote() {
+    let pool = QUOTES.filter(q => q.moods.includes(currentMood));
+    if (pool.length === 0 || pool.every(q => seenIds.has(q.id))) pool = QUOTES;
+    let unseen = pool.filter(q => !seenIds.has(q.id));
+    if (unseen.length === 0) { seenIds.clear(); unseen = pool; }
+    const quote = unseen[Math.floor(Math.random() * unseen.length)];
+    seenIds.add(quote.id);
+    return quote;
+  }
+
+  /* ═══════════════════════════════════════════
+     DISPLAY QUOTE
+     ═══════════════════════════════════════════ */
+  function displayQuote(quote) {
+    quoteArea.classList.add('animating');
+    humorLine.classList.add('animating');
+    setTimeout(() => {
+      quoteText.textContent = quote.text;
+      quoteSource.textContent = '— ' + quote.source;
+      quoteMeta.textContent = quote.meta;
+      humorLine.textContent = HUMOUR[Math.floor(Math.random() * HUMOUR.length)];
+      humorLine.style.display = 'block';
+      quoteArea.classList.remove('animating');
+      humorLine.classList.remove('animating');
+      updateProgress();
+    }, 250);
+  }
+
+  /* ═══════════════════════════════════════════
+     PROGRESS
+     ═══════════════════════════════════════════ */
+  function updateProgress() {
+    const total = QUOTES.length;
+    const seen = seenIds.size;
+    progressRow.style.display = 'flex';
+    progressCount.textContent = seen + '/' + total;
+    progressFill.style.width = (seen / total * 100) + '%';
+    if (seen >= total) progressCount.textContent = 'All wisdom unlocked! 🏆';
+  }
+
+  /* ═══════════════════════════════════════════
+     BHAI PRESS
+     ═══════════════════════════════════════════ */
+  function pressBhai() {
+    if (isAnimating) return;
+    isAnimating = true;
+    bhaiBtn.classList.remove('shake');
+    void bhaiBtn.offsetWidth;
+    bhaiBtn.classList.add('shake');
+    const quote = pickQuote();
+    displayQuote(quote);
+    if (navigator.vibrate) navigator.vibrate(30);
+    bhaiHint.textContent = 'Bhai has spoken. 🫡';
+    setTimeout(() => { isAnimating = false; }, 600);
+  }
+
+  /* ═══════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════ */
+  let toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  /* ═══════════════════════════════════════════
+     ENTER
+     ═══════════════════════════════════════════ */
+  function enterGame() {
+    landing.style.display = 'none';
+    game.classList.add('active');
+    buildMoods();
+    showToast('Bhai is ready. Press the button.');
+  }
+
+  /* ═══════════════════════════════════════════
+     PARTICLE SYSTEM
+     ═══════════════════════════════════════════ */
+  function initParticles() {
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let w, h, particles;
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    const COLORS = ['rgba(230,57,70,0.35)', 'rgba(244,162,97,0.3)', 'rgba(255,255,255,0.12)', 'rgba(230,57,70,0.15)'];
+    const COUNT = Math.min(50, Math.floor(w * h / 18000));
+    particles = Array.from({ length: COUNT }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      r: Math.random() * 2.2 + 0.6,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35 - 0.15,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: Math.random() * 0.5 + 0.2,
+      pulse: Math.random() * Math.PI * 2
+    }));
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.pulse += 0.015;
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10;
+        if (p.y > h + 10) p.y = -10;
+        const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color.replace(/[\d.]+\)$/, a + ')');
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  /* ═══════════════════════════════════════════
+     EVENTS
+     ═══════════════════════════════════════════ */
+  $('#enterBtn').addEventListener('click', enterGame);
+  bhaiBtn.addEventListener('click', pressBhai);
+  againBtn.addEventListener('click', pressBhai);
+
+  /* ═══════════════════════════════════════════
+     BOOT
+     ═══════════════════════════════════════════ */
+  initParticles();
+  initPhoto();
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
+})();
+</script>
+</body>
+</html>
